@@ -1,4 +1,11 @@
 document.getElementById('startButton').addEventListener('click', function() {
+    // Verifica si el navegador soporta getUserMedia
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('message').textContent = "Tu navegador no soporta acceso a la cámara.";
+        return;
+    }
+
+    // Inicializa Quagga
     Quagga.init({
         inputStream: {
             name: "Live",
@@ -11,8 +18,9 @@ document.getElementById('startButton').addEventListener('click', function() {
             }
         },
         decoder: {
-            readers: ["code_128_reader"] // Solo lee códigos Code 128
-        }
+            readers: ["ean_reader"] // Configura Quagga para leer códigos EAN-13
+        },
+        locate: true // Habilita la detección de la región del código de barras
     }, function(err) {
         if (err) {
             console.error("Error al inicializar Quagga:", err);
@@ -23,6 +31,7 @@ document.getElementById('startButton').addEventListener('click', function() {
         Quagga.start();
     });
 
+    // Escucha eventos de detección
     Quagga.onDetected(function(result) {
         const code = result.codeResult.code;
         console.log("Código detectado:", code);
