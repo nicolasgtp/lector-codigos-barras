@@ -7,23 +7,25 @@ document.getElementById('startButton').addEventListener('click', function() {
             constraints: {
                 width: 300,
                 height: 200,
-                facingMode: "environment"
+                facingMode: "environment" // Usa la cámara trasera
             }
         },
         decoder: {
-            readers: ["code_128_reader", "ean_reader", "upc_reader"]
+            readers: ["code_128_reader"] // Solo lee códigos Code 128
         }
     }, function(err) {
         if (err) {
-            console.error(err);
+            console.error("Error al inicializar Quagga:", err);
+            document.getElementById('message').textContent = "Error al iniciar el escáner.";
             return;
         }
-        console.log("Inicialización exitosa. Escaneando...");
+        console.log("Quagga inicializado correctamente.");
         Quagga.start();
     });
 
     Quagga.onDetected(function(result) {
         const code = result.codeResult.code;
+        console.log("Código detectado:", code);
         document.getElementById('message').textContent = `Código detectado: ${code}`;
         checkAndInsertCode(code);
     });
@@ -44,7 +46,10 @@ function checkAndInsertCode(code) {
             insertCode(code);
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error al verificar el código:', error);
+        document.getElementById('message').textContent = 'Error al verificar el código.';
+    });
 }
 
 function insertCode(code) {
@@ -67,5 +72,8 @@ function insertCode(code) {
     .then(data => {
         document.getElementById('message').textContent = 'Código ingresado: ' + code;
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error al insertar el código:', error);
+        document.getElementById('message').textContent = 'Error al insertar el código.';
+    });
 }
